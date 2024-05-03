@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.ForumCommentDao">
+
+    <resultMap type="org.example.entity.ForumComment" id="ForumCommentMap">
+        <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
+        <result property="pCommentId" column="p_comment_id" jdbcType="INTEGER"/>
+        <result property="articleId" column="article_id" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="imgPath" column="img_path" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="userIpAddress" column="user_ip_address" jdbcType="VARCHAR"/>
+        <result property="replyUserId" column="reply_user_id" jdbcType="VARCHAR"/>
+        <result property="replyNickName" column="reply_nick_name" jdbcType="VARCHAR"/>
+        <result property="topType" column="top_type" jdbcType="INTEGER"/>
+        <result property="postTime" column="post_time" jdbcType="TIMESTAMP"/>
+        <result property="goodCount" column="good_count" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ForumCommentMap">
+        select comment_id,
+               p_comment_id,
+               article_id,
+               content,
+               img_path,
+               user_id,
+               nick_name,
+               user_ip_address,
+               reply_user_id,
+               reply_nick_name,
+               top_type,
+               post_time,
+               good_count,
+               status
+        from forum_comment
+        where comment_id = #{commentId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from forum_comment
+        <where>
+            <if test="commentId != null">
+                and comment_id = #{commentId}
+            </if>
+            <if test="pCommentId != null">
+                and p_comment_id = #{pCommentId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="imgPath != null and imgPath != ''">
+                and img_path = #{imgPath}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="nickName != null and nickName != ''">
+                and nick_name = #{nickName}
+            </if>
+            <if test="userIpAddress != null and userIpAddress != ''">
+                and user_ip_address = #{userIpAddress}
+            </if>
+            <if test="replyUserId != null and replyUserId != ''">
+                and reply_user_id = #{replyUserId}
+            </if>
+            <if test="replyNickName != null and replyNickName != ''">
+                and reply_nick_name = #{replyNickName}
+            </if>
+            <if test="topType != null">
+                and top_type = #{topType}
+            </if>
+            <if test="postTime != null">
+                and post_time = #{postTime}
+            </if>
+            <if test="goodCount != null">
+                and good_count = #{goodCount}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="commentId" useGeneratedKeys="true">
+        insert into forum_comment(p_comment_id, article_id, content, img_path, user_id, nick_name, user_ip_address,
+                                  reply_user_id, reply_nick_name, top_type, post_time, good_count, status)
+        values (#{pCommentId}, #{articleId}, #{content}, #{imgPath}, #{userId}, #{nickName}, #{userIpAddress},
+                #{replyUserId}, #{replyNickName}, #{topType}, #{postTime}, #{goodCount}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="commentId" useGeneratedKeys="true">
+        insert into forum_comment(p_comment_id, article_id, content, img_path, user_id, nick_name, user_ip_address, reply_user_id, reply_nick_name, top_type, post_time, good_count, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.pCommentId}, #{entity.articleId}, #{entity.content}, #{entity.imgPath}, #{entity.userId}, #{entity.nickName}, #{entity.userIpAddress}, #{entity.replyUserId}, #{entity.replyNickName}, #{entity.topType}, #{entity.postTime}, #{entity.goodCount}, #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="commentId" useGeneratedKeys="true">
+        insert into forum_comment(p_comment_id, article_id, content, img_path, user_id, nick_name, user_ip_address, reply_user_id, reply_nick_name, top_type, post_time, good_count, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.pCommentId}, #{entity.articleId}, #{entity.content}, #{entity.imgPath}, #{entity.userId}, #{entity.nickName}, #{entity.userIpAddress}, #{entity.replyUserId}, #{entity.replyNickName}, #{entity.topType}, #{entity.postTime}, #{entity.goodCount}, #{entity.status})
+        </foreach>
+        on duplicate key update
+p_comment_id = values(p_comment_id),
+article_id = values(article_id),
+content = values(content),
+img_path = values(img_path),
+user_id = values(user_id),
+nick_name = values(nick_name),
+user_ip_address = values(user_ip_address),
+reply_user_id = values(reply_user_id),
+reply_nick_name = values(reply_nick_name),
+top_type = values(top_type),
+post_time = values(post_time),
+good_count = values(good_count),
+status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update forum_comment
+        <set>
+            <if test="pCommentId != null">
+                p_comment_id = #{pCommentId},
+            </if>
+            <if test="articleId != null and articleId != ''">
+                article_id = #{articleId},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="imgPath != null and imgPath != ''">
+                img_path = #{imgPath},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="nickName != null and nickName != ''">
+                nick_name = #{nickName},
+            </if>
+            <if test="userIpAddress != null and userIpAddress != ''">
+                user_ip_address = #{userIpAddress},
+            </if>
+            <if test="replyUserId != null and replyUserId != ''">
+                reply_user_id = #{replyUserId},
+            </if>
+            <if test="replyNickName != null and replyNickName != ''">
+                reply_nick_name = #{replyNickName},
+            </if>
+            <if test="topType != null">
+                top_type = #{topType},
+            </if>
+            <if test="postTime != null">
+                post_time = #{postTime},
+            </if>
+            <if test="goodCount != null">
+                good_count = #{goodCount},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where comment_id = #{commentId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from forum_comment where comment_id = #{commentId}
+    </delete>
+
+</mapper>
+

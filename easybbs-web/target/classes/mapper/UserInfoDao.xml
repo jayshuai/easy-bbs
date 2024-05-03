@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.UserInfoDao">
+
+    <resultMap type="org.example.entity.UserInfo" id="UserInfoMap">
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="email" column="email" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="personDescription" column="person_description" jdbcType="VARCHAR"/>
+        <result property="joinTime" column="join_time" jdbcType="TIMESTAMP"/>
+        <result property="lastLoginTime" column="last_login_time" jdbcType="TIMESTAMP"/>
+        <result property="lastLoginIp" column="last_login_ip" jdbcType="VARCHAR"/>
+        <result property="lastLoginIpAddress" column="last_login_ip_address" jdbcType="VARCHAR"/>
+        <result property="totalIntegral" column="total_integral" jdbcType="INTEGER"/>
+        <result property="currentIntegral" column="current_integral" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserInfoMap">
+        select user_id,
+               nick_name,
+               email,
+               password,
+               sex,
+               person_description,
+               join_time,
+               last_login_time,
+               last_login_ip,
+               last_login_ip_address,
+               total_integral,
+               current_integral,
+               status
+        from user_info
+        where user_id = #{userId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_info
+        <where>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="nickName != null and nickName != ''">
+                and nick_name = #{nickName}
+            </if>
+            <if test="email != null and email != ''">
+                and email = #{email}
+            </if>
+            <if test="password != null and password != ''">
+                and password = #{password}
+            </if>
+            <if test="sex != null">
+                and sex = #{sex}
+            </if>
+            <if test="personDescription != null and personDescription != ''">
+                and person_description = #{personDescription}
+            </if>
+            <if test="joinTime != null">
+                and join_time = #{joinTime}
+            </if>
+            <if test="lastLoginTime != null">
+                and last_login_time = #{lastLoginTime}
+            </if>
+            <if test="lastLoginIp != null and lastLoginIp != ''">
+                and last_login_ip = #{lastLoginIp}
+            </if>
+            <if test="lastLoginIpAddress != null and lastLoginIpAddress != ''">
+                and last_login_ip_address = #{lastLoginIpAddress}
+            </if>
+            <if test="totalIntegral != null">
+                and total_integral = #{totalIntegral}
+            </if>
+            <if test="currentIntegral != null">
+                and current_integral = #{currentIntegral}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="queryByEmail" resultMap="UserInfoMap">
+        select user_id,
+               nick_name,
+               email,
+               password,
+               sex,
+               person_description,
+               join_time,
+               last_login_time,
+               last_login_ip,
+               last_login_ip_address,
+               total_integral,
+               current_integral,
+               status
+        from user_info
+        where email = #{email}
+    </select>
+    <select id="queryBynickName" resultMap="UserInfoMap">
+        select user_id,
+               nick_name,
+               email,
+               password,
+               sex,
+               person_description,
+               join_time,
+               last_login_time,
+               last_login_ip,
+               last_login_ip_address,
+               total_integral,
+               current_integral,
+               status
+        from user_info
+        where nick_name = #{nickName}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="userId" >
+        insert into user_info(user_id, nick_name, email, password, sex, person_description, join_time, last_login_time,
+                              last_login_ip, last_login_ip_address, total_integral, current_integral, status)
+        values (#{userId}, #{nickName}, #{email}, #{password}, #{sex}, #{personDescription}, #{joinTime},
+                #{lastLoginTime},
+                #{lastLoginIp}, #{lastLoginIpAddress}, #{totalIntegral}, #{currentIntegral}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user_info(nick_name, email, password, sex, person_description, join_time, last_login_time,
+        last_login_ip, last_login_ip_address, total_integral, current_integral, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.nickName}, #{entity.email}, #{entity.password}, #{entity.sex}, #{entity.personDescription},
+            #{entity.joinTime}, #{entity.lastLoginTime}, #{entity.lastLoginIp}, #{entity.lastLoginIpAddress},
+            #{entity.totalIntegral}, #{entity.currentIntegral}, #{entity.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="userId" useGeneratedKeys="true">
+        insert into user_info(nick_name, email, password, sex, person_description, join_time, last_login_time,
+        last_login_ip, last_login_ip_address, total_integral, current_integral, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.nickName}, #{entity.email}, #{entity.password}, #{entity.sex}, #{entity.personDescription},
+            #{entity.joinTime}, #{entity.lastLoginTime}, #{entity.lastLoginIp}, #{entity.lastLoginIpAddress},
+            #{entity.totalIntegral}, #{entity.currentIntegral}, #{entity.status})
+        </foreach>
+        on duplicate key update
+        nick_name = values(nick_name),
+        email = values(email),
+        password = values(password),
+        sex = values(sex),
+        person_description = values(person_description),
+        join_time = values(join_time),
+        last_login_time = values(last_login_time),
+        last_login_ip = values(last_login_ip),
+        last_login_ip_address = values(last_login_ip_address),
+        total_integral = values(total_integral),
+        current_integral = values(current_integral),
+        status = values(status)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_info
+        <set>
+            <if test="nickName != null and nickName != ''">
+                nick_name = #{nickName},
+            </if>
+            <if test="email != null and email != ''">
+                email = #{email},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="sex != null">
+                sex = #{sex},
+            </if>
+            <if test="personDescription != null and personDescription != ''">
+                person_description = #{personDescription},
+            </if>
+            <if test="joinTime != null">
+                join_time = #{joinTime},
+            </if>
+            <if test="lastLoginTime != null">
+                last_login_time = #{lastLoginTime},
+            </if>
+            <if test="lastLoginIp != null and lastLoginIp != ''">
+                last_login_ip = #{lastLoginIp},
+            </if>
+            <if test="lastLoginIpAddress != null and lastLoginIpAddress != ''">
+                last_login_ip_address = #{lastLoginIpAddress},
+            </if>
+            <if test="totalIntegral != null">
+                total_integral = #{totalIntegral},
+            </if>
+            <if test="currentIntegral != null">
+                current_integral = #{currentIntegral},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+    <update id="updateIntegral">
+        update user_info
+        set current_integral = current_integral+#{integer}
+        <if test="integer>0">
+            ,total_integral=total_integral+#{integer}
+        </if>
+        where user_id=#{userId}
+        <![CDATA[and current_integral+#{integer}>=0]]>
+    </update>
+    <update id="updateUserIntegral">
+
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_info
+        where user_id = #{userId}
+    </delete>
+
+</mapper>
+

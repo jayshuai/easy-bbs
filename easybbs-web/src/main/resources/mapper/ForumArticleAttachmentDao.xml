@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.ForumArticleAttachmentDao">
+
+    <resultMap type="org.example.entity.ForumArticleAttachment" id="ForumArticleAttachmentMap">
+        <result property="fileId" column="file_id" jdbcType="VARCHAR"/>
+        <result property="articleId" column="article_id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="fileSize" column="file_size" jdbcType="INTEGER"/>
+        <result property="fileName" column="file_name" jdbcType="VARCHAR"/>
+        <result property="downloadCount" column="download_count" jdbcType="INTEGER"/>
+        <result property="filePath" column="file_path" jdbcType="VARCHAR"/>
+        <result property="fileType" column="file_type" jdbcType="INTEGER"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ForumArticleAttachmentMap">
+        select file_id,
+               article_id,
+               user_id,
+               file_size,
+               file_name,
+               download_count,
+               file_path,
+               file_type,
+               integral
+        from forum_article_attachment
+        where file_id = #{fileId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from forum_article_attachment
+        <where>
+            <if test="fileId != null and fileId != ''">
+                and file_id = #{fileId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="fileSize != null">
+                and file_size = #{fileSize}
+            </if>
+            <if test="fileName != null and fileName != ''">
+                and file_name = #{fileName}
+            </if>
+            <if test="downloadCount != null">
+                and download_count = #{downloadCount}
+            </if>
+            <if test="filePath != null and filePath != ''">
+                and file_path = #{filePath}
+            </if>
+            <if test="fileType != null">
+                and file_type = #{fileType}
+            </if>
+            <if test="integral != null">
+                and integral = #{integral}
+            </if>
+        </where>
+    </select>
+    <select id="queryByArticleId" resultMap="ForumArticleAttachmentMap">
+        select file_id,
+               article_id,
+               user_id,
+               file_size,
+               file_name,
+               download_count,
+               file_path,
+               file_type,
+               integral
+        from forum_article_attachment
+        where article_id = #{article_id}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment(article_id, user_id, file_size, file_name, download_count, file_path,
+                                             file_type, integral)
+        values (#{articleId}, #{userId}, #{fileSize}, #{fileName}, #{downloadCount}, #{filePath}, #{fileType},
+                #{integral})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment(article_id, user_id, file_size, file_name, download_count, file_path,
+        file_type, integral)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.articleId}, #{entity.userId}, #{entity.fileSize}, #{entity.fileName}, #{entity.downloadCount},
+            #{entity.filePath}, #{entity.fileType}, #{entity.integral})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment(article_id, user_id, file_size, file_name, download_count, file_path,
+        file_type, integral)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.articleId}, #{entity.userId}, #{entity.fileSize}, #{entity.fileName}, #{entity.downloadCount},
+            #{entity.filePath}, #{entity.fileType}, #{entity.integral})
+        </foreach>
+        on duplicate key update
+        article_id = values(article_id),
+        user_id = values(user_id),
+        file_size = values(file_size),
+        file_name = values(file_name),
+        download_count = values(download_count),
+        file_path = values(file_path),
+        file_type = values(file_type),
+        integral = values(integral)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update forum_article_attachment
+        <set>
+            <if test="articleId != null and articleId != ''">
+                article_id = #{articleId},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="fileSize != null">
+                file_size = #{fileSize},
+            </if>
+            <if test="fileName != null and fileName != ''">
+                file_name = #{fileName},
+            </if>
+            <if test="downloadCount != null">
+                download_count = #{downloadCount},
+            </if>
+            <if test="filePath != null and filePath != ''">
+                file_path = #{filePath},
+            </if>
+            <if test="fileType != null">
+                file_type = #{fileType},
+            </if>
+            <if test="integral != null">
+                integral = #{integral},
+            </if>
+        </set>
+        where file_id = #{fileId}
+    </update>
+    <update id="updateDownloadCount">
+        update forum_article_attachment
+        set download_count = download_count + 1
+        where file_id = #{fileId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from forum_article_attachment
+        where file_id = #{fileId}
+    </delete>
+
+</mapper>
+

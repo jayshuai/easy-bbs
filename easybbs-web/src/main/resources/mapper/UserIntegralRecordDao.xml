@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.UserIntegralRecordDao">
+
+    <resultMap type="org.example.entity.UserIntegralRecord" id="UserIntegralRecordMap">
+        <result property="recordId" column="record_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="operType" column="oper_type" jdbcType="INTEGER"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserIntegralRecordMap">
+        select record_id, user_id, oper_type, integral, create_time
+        from user_integral_record
+        where record_id = #{recordId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_integral_record
+        <where>
+            <if test="recordId != null">
+                and record_id = #{recordId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="operType != null">
+                and oper_type = #{operType}
+            </if>
+            <if test="integral != null">
+                and integral = #{integral}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="recordId" useGeneratedKeys="true">
+        insert into user_integral_record(user_id, oper_type, integral, create_time)
+        values (#{userId}, #{operType}, #{integral}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="recordId" useGeneratedKeys="true">
+        insert into user_integral_record(user_id, oper_type, integral, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.operType}, #{entity.integral}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="recordId" useGeneratedKeys="true">
+        insert into user_integral_record(user_id, oper_type, integral, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.userId}, #{entity.operType}, #{entity.integral}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        user_id = values(user_id),
+        oper_type = values(oper_type),
+        integral = values(integral),
+        create_time = values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_integral_record
+        <set>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="operType != null">
+                oper_type = #{operType},
+            </if>
+            <if test="integral != null">
+                integral = #{integral},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where record_id = #{recordId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_integral_record
+        where record_id = #{recordId}
+    </delete>
+
+</mapper>
+

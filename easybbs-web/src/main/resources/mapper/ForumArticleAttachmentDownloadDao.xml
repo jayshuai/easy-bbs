@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.ForumArticleAttachmentDownloadDao">
+
+    <resultMap type="org.example.entity.ForumArticleAttachmentDownload" id="ForumArticleAttachmentDownloadMap">
+        <result property="fileId" column="file_id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="articleId" column="article_id" jdbcType="VARCHAR"/>
+        <result property="downloadCount" column="download_count" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ForumArticleAttachmentDownloadMap">
+        select file_id, user_id, article_id, download_count
+        from forum_article_attachment_download
+        where file_id = #{fileId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from forum_article_attachment_download
+        <where>
+            <if test="fileId != null and fileId != ''">
+                and file_id = #{fileId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="downloadCount != null">
+                and download_count = #{downloadCount}
+            </if>
+        </where>
+    </select>
+    <select id="queryByIdAndUserId" resultMap="ForumArticleAttachmentDownloadMap">
+        select file_id, user_id, article_id, download_count
+        from forum_article_attachment_download
+        <where>
+            <if test="fileId != null and fileId != ''">
+                and file_id = #{fileId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="downloadCount != null">
+                and download_count = #{downloadCount}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment_download(article_id, download_count)
+        values (#{articleId},#{downloadCount})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment_download(article_id, download_count)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.articleId}, #{entity.downloadCount})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment_download(article_id, download_count)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.articleId}, #{entity.downloadCount})
+        </foreach>
+        on duplicate key update
+        article_id = values(article_id),
+        download_count = values(download_count)
+    </insert>
+    <insert id="insertOrUpdate" keyProperty="fileId" useGeneratedKeys="true">
+        insert into forum_article_attachment_download(article_id, download_count, user_id, file_id)
+        values (#{entity.articleId}, #{entity.downloadCount}) on duplicate key
+        on duplicate key
+        <trim prefix="" suffix="" suffixOverrides=",">
+            <if test="entities.fileId!=null">
+                file_id=values(file_id)
+            </if>
+            <if test="entities.userId!=null">
+                user_id=values(userId)
+            </if>
+            <if test="entities.articleId!=null">
+                article_id=values(articleId)
+            </if>
+            <if test="entities.downloadCount!=null">
+                download_count=download_count+1
+            </if>
+        </trim>
+    </insert>
+    <!--通过主键修改数据-->
+    <update id="update">
+        update forum_article_attachment_download
+        <set>
+            <if test="articleId != null and articleId != ''">
+                article_id = #{articleId},
+            </if>
+            <if test="downloadCount != null">
+                download_count = #{downloadCount},
+            </if>
+        </set>
+        where file_id = #{fileId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from forum_article_attachment_download
+        where file_id = #{fileId}
+    </delete>
+
+</mapper>
+

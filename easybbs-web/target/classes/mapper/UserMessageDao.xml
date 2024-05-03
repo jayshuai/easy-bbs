@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.UserMessageDao">
+
+    <resultMap type="org.example.entity.UserMessage" id="UserMessageMap">
+        <result property="messageId" column="message_id" jdbcType="INTEGER"/>
+        <result property="receivedUserId" column="received_user_id" jdbcType="VARCHAR"/>
+        <result property="articleId" column="article_id" jdbcType="VARCHAR"/>
+        <result property="articleTitle" column="article_title" jdbcType="VARCHAR"/>
+        <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
+        <result property="sendUserId" column="send_user_id" jdbcType="VARCHAR"/>
+        <result property="sendNickName" column="send_nick_name" jdbcType="VARCHAR"/>
+        <result property="messageType" column="message_type" jdbcType="INTEGER"/>
+        <result property="messageContent" column="message_content" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="UserMessageMap">
+        select message_id,
+               received_user_id,
+               article_id,
+               article_title,
+               comment_id,
+               send_user_id,
+               send_nick_name,
+               message_type,
+               message_content,
+               status,
+               create_time
+        from user_message
+        where message_id = #{messageId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from user_message
+        <where>
+            <if test="messageId != null">
+                and message_id = #{messageId}
+            </if>
+            <if test="receivedUserId != null and receivedUserId != ''">
+                and received_user_id = #{receivedUserId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="articleTitle != null and articleTitle != ''">
+                and article_title = #{articleTitle}
+            </if>
+            <if test="commentId != null">
+                and comment_id = #{commentId}
+            </if>
+            <if test="sendUserId != null and sendUserId != ''">
+                and send_user_id = #{sendUserId}
+            </if>
+            <if test="sendNickName != null and sendNickName != ''">
+                and send_nick_name = #{sendNickName}
+            </if>
+            <if test="messageType != null">
+                and message_type = #{messageType}
+            </if>
+            <if test="messageContent != null and messageContent != ''">
+                and message_content = #{messageContent}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+    <select id="queryByArticleIdAndCommentIdAndSendUserIdAndMessageType"
+            resultMap="UserMessageMap">
+        select message_id,
+        received_user_id,
+        article_id,
+        article_title,
+        comment_id,
+        send_user_id,
+        send_nick_name,
+        message_type,
+        message_content,
+        status,
+        create_time
+        from user_message
+        <where>
+            <if test="messageId != null">
+                and message_id = #{messageId}
+            </if>
+            <if test="receivedUserId != null and receivedUserId != ''">
+                and received_user_id = #{receivedUserId}
+            </if>
+            <if test="articleId != null and articleId != ''">
+                and article_id = #{articleId}
+            </if>
+            <if test="articleTitle != null and articleTitle != ''">
+                and article_title = #{articleTitle}
+            </if>
+            <if test="commentId != null">
+                and comment_id = #{commentId}
+            </if>
+            <if test="sendUserId != null and sendUserId != ''">
+                and send_user_id = #{sendUserId}
+            </if>
+            <if test="sendNickName != null and sendNickName != ''">
+                and send_nick_name = #{sendNickName}
+            </if>
+            <if test="messageType != null">
+                and message_type = #{messageType}
+            </if>
+            <if test="messageContent != null and messageContent != ''">
+                and message_content = #{messageContent}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="messageId" useGeneratedKeys="true">
+        insert into user_message(received_user_id, article_id, article_title, comment_id, send_user_id, send_nick_name,
+                                 message_type, message_content, status, create_time)
+        values (#{receivedUserId}, #{articleId}, #{articleTitle}, #{commentId}, #{sendUserId}, #{sendNickName},
+                #{messageType}, #{messageContent}, #{status}, #{createTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="messageId" useGeneratedKeys="true">
+        insert into user_message(received_user_id, article_id, article_title, comment_id, send_user_id, send_nick_name,
+        message_type, message_content, status, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.receivedUserId}, #{entity.articleId}, #{entity.articleTitle}, #{entity.commentId},
+            #{entity.sendUserId}, #{entity.sendNickName}, #{entity.messageType}, #{entity.messageContent},
+            #{entity.status}, #{entity.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="messageId" useGeneratedKeys="true">
+        insert into user_message(received_user_id, article_id, article_title, comment_id, send_user_id, send_nick_name,
+        message_type, message_content, status, create_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.receivedUserId}, #{entity.articleId}, #{entity.articleTitle}, #{entity.commentId},
+            #{entity.sendUserId}, #{entity.sendNickName}, #{entity.messageType}, #{entity.messageContent},
+            #{entity.status}, #{entity.createTime})
+        </foreach>
+        on duplicate key update
+        received_user_id = values(received_user_id),
+        article_id = values(article_id),
+        article_title = values(article_title),
+        comment_id = values(comment_id),
+        send_user_id = values(send_user_id),
+        send_nick_name = values(send_nick_name),
+        message_type = values(message_type),
+        message_content = values(message_content),
+        status = values(status),
+        create_time = values(create_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update user_message
+        <set>
+            <if test="receivedUserId != null and receivedUserId != ''">
+                received_user_id = #{receivedUserId},
+            </if>
+            <if test="articleId != null and articleId != ''">
+                article_id = #{articleId},
+            </if>
+            <if test="articleTitle != null and articleTitle != ''">
+                article_title = #{articleTitle},
+            </if>
+            <if test="commentId != null">
+                comment_id = #{commentId},
+            </if>
+            <if test="sendUserId != null and sendUserId != ''">
+                send_user_id = #{sendUserId},
+            </if>
+            <if test="sendNickName != null and sendNickName != ''">
+                send_nick_name = #{sendNickName},
+            </if>
+            <if test="messageType != null">
+                message_type = #{messageType},
+            </if>
+            <if test="messageContent != null and messageContent != ''">
+                message_content = #{messageContent},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where message_id = #{messageId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from user_message
+        where message_id = #{messageId}
+    </delete>
+
+</mapper>
+

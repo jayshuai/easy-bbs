@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.dao.LikeRecordDao">
+
+    <resultMap type="org.example.entity.LikeRecord" id="LikeRecordMap">
+        <result property="opId" column="op_id" jdbcType="INTEGER"/>
+        <result property="opType" column="op_type" jdbcType="INTEGER"/>
+        <result property="objectId" column="object_id" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="authorUserId" column="author_user_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="LikeRecordMap">
+        select op_id, op_type, object_id, user_id, create_time, author_user_id
+        from like_record
+        where op_id = #{opId}
+    </select>
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from like_record
+        <where>
+            <if test="opId != null">
+                and op_id = #{opId}
+            </if>
+            <if test="opType != null">
+                and op_type = #{opType}
+            </if>
+            <if test="objectId != null and objectId != ''">
+                and object_id = #{objectId}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="authorUserId != null and authorUserId != ''">
+                and author_user_id = #{authorUserId}
+            </if>
+        </where>
+    </select>
+    <select id="queryRecordByObjectIdAndUserIdAndOrderType" resultType="org.example.entity.LikeRecord">
+        select op_id, op_type, object_id, user_id, create_time, author_user_id
+        from like_record
+        where 1=1
+        <if test="objectId != null and objectId != ''">
+            and object_id = #{objectId}
+        </if>
+        <if test="userId != null and userId != ''">
+            and user_id = #{userId}
+        </if>
+        <if test="opType != null">
+            and op_type = #{opType}
+        </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="opId" useGeneratedKeys="true">
+        insert into like_record(op_type, object_id, user_id, create_time, author_user_id)
+        values (#{opType}, #{objectId}, #{userId}, #{createTime}, #{authorUserId})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="opId" useGeneratedKeys="true">
+        insert into like_record(op_type, object_id, user_id, create_time, author_user_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.opType}, #{entity.objectId}, #{entity.userId}, #{entity.createTime}, #{entity.authorUserId})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="opId" useGeneratedKeys="true">
+        insert into like_record(op_type, object_id, user_id, create_time, author_user_id)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.opType}, #{entity.objectId}, #{entity.userId}, #{entity.createTime}, #{entity.authorUserId})
+        </foreach>
+        on duplicate key update
+        op_type = values(op_type),
+        object_id = values(object_id),
+        user_id = values(user_id),
+        create_time = values(create_time),
+        author_user_id = values(author_user_id)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update like_record
+        <set>
+            <if test="opType != null">
+                op_type = #{opType},
+            </if>
+            <if test="objectId != null and objectId != ''">
+                object_id = #{objectId},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="authorUserId != null and authorUserId != ''">
+                author_user_id = #{authorUserId},
+            </if>
+        </set>
+        where op_id = #{opId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from like_record
+        where op_id = #{opId}
+    </delete>
+    <delete id="deleteByObjectIdAndUserIdAndOpType">
+        delete
+        from like_record
+        where 1=1
+        <if test="objectId != null and objectId != ''">
+            and object_id = #{objectId},
+        </if>
+        <if test="userId != null and userId != ''">
+            and user_id = #{userId},
+        </if>
+        <if test="opType != null">
+            and op_type = #{opType},
+        </if>
+    </delete>
+
+</mapper>
+
